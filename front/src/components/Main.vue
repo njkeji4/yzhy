@@ -63,7 +63,7 @@
 					<div style="float:right">
 						<el-dropdown trigger="click" @command="handleCommand">
 							<span class="el-dropdown-link" style="color:white;">
-								<i  class="header_icon3 header_icon"></i>
+								<i  class="el-icon-user-solid" style="font-size:25px;font-weight:bold;"></i>
 								{{sysUserInfo.name}}
 								<i class="el-icon-arrow-down el-icon--right"></i>
 							</span>
@@ -225,6 +225,7 @@
 		background-color: #222d32;
 		padding-left:0px;
 		padding-right:0px;
+		
 	}
 	
 	/* menu item   */

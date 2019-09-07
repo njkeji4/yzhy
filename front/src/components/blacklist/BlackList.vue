@@ -8,18 +8,7 @@
 					<el-button size="small" @click="addBlacklist">新增</el-button>	
 					<el-button size="small" @click="removeBlacklist" :disabled="this.sels.length === 0" style="margin-right:10px">删除</el-button>
 					<el-button size="small" @click="exportBlacklist" style="margin-right:10px;">导出</el-button>	
-					<el-upload  style="float:right;"
-						ref="fileUpload"
-						name="uploadFile"
-						:show-file-list=false
-						accept=".xls,.xlsx"
-						:multiple="false"
-						:action="batchAddUploadURL"
-						:on-success="uploadFileSuccess"
-						:on-error="uploadFileError"
-						:before-upload="uploadFileBeforeUpload">
-						<el-button type="primary" slot="trigger" size="small" :loading="loading">批量导入</el-button>
-					</el-upload>	
+					<el-button size="small" @click="upload">批量导入</el-button>
 				</div>
 			</el-col>
 
@@ -31,6 +20,9 @@
 					</el-form-item>
 					<el-form-item label="" prop="cardNo">
 						<el-input size="small" v-model="searchForm.cardNo" placeholder="身份证号码"></el-input>
+					</el-form-item>
+					<el-form-item label="" prop="groupName">
+						<el-input size="small" v-model="searchForm.groupName" placeholder="所属组"></el-input>
 					</el-form-item>
 					<el-form-item label="" prop="sex">
 						<el-select clearable size="small" v-model="searchForm.sex" placeholder="性别">
@@ -50,8 +42,7 @@
 		<section class="grid-content">
 			<el-table :data="blacklist" resizable border highlight-current-row stripe v-loading="listLoading" ref="table"
 			  @selection-change="handleSelectionChange" 
-			  @row-dblclick="handleDblClickRow" class="cmcc-cell-nowrap"
-			  >
+			  class="cmcc-cell-nowrap">
 
 				<el-table-column header-align="center"  type="selection">
 				</el-table-column>
@@ -65,10 +56,10 @@
 						{{scope.row.sex == '2'?'女':'男'}}					
 					</template>
 				</el-table-column>
-				<!--el-table-column  prop="folk" label="民族" >
-				</el-table-column>				
-				<el-table-column  prop="address" label="地址" >
-				</el-table-column-->				
+
+				<el-table-column  prop="groupName" label="所属组" >
+				</el-table-column>		
+					
 			</el-table>	
 		</section>
 
@@ -104,10 +95,9 @@
 					name: '',	
 					cardNo:'',
 					sex:'',
-					folk:'',
-					address:''
+					groupName:''
 				},
-
+				groups:[],
 				batchAddUploadURL: AdminAPI.uploadBlackListUrl,    
 				blacklist: [],
 				total: 2,
@@ -125,7 +115,30 @@
 			
 		},
 		methods: {		
-			
+			upload() {
+				openBatchAddModal({
+					data: {
+						groups:this.groups
+					}
+				}).then((data)=>{
+					
+					this.getBlackList();
+				});
+			},
+			getDeviceGroup(){
+				AdminAPI.getDeviceGroups().then(({
+					data: jsonData
+				}) => {
+					if(jsonData.status === 0) {
+						this.groups = jsonData.data;
+					} else {
+						this.$message({
+							messsage: `获取组失败:${data.msg}`,
+							type: 'error'
+						})
+					}
+				});
+			},
 			exportBlacklist(){
 				//AdminAPI.exportBlackList();
 				setTimeout(() => {
@@ -172,19 +185,7 @@
 			handleSelectionChange: function(sels) {
 				this.sels = sels;				
 			},
-			handleDblClickRow:function(row, event){
-				
-				openAddBlacklistDlg({
-					data: {
-						personInfo : row
-					}
-				}).then((data) => {
-					
-					if(data !== undefined){
-						this.getBlackList();
-					}
-				});
-			},
+			
 			handleSizeChange:function(size){
 				this.pageSize = size;
 				this.handleCurrentChange(1);
@@ -194,10 +195,15 @@
 				this.getBlackList();
 			},
 
-			addBlacklist:function(){
-				openAddBlacklistDlg().then((data)=>{
-					if(data)
+			addBlacklist(){
+				openAddBlacklistDlg({
+					data: {
+						groups:this.groups
+					}
+				}).then((data)=>{
+					if(data !== undefined){
 						this.getBlackList();
+					}
 				});
 			},			
 
@@ -206,7 +212,7 @@
 					page: this.page-1,
 					size:this.pageSize,
 					order:'asc',
-					sort:'name'
+					sort:'groupName'
 				};				
 				this._getBlackList(params);
 			},
@@ -231,7 +237,7 @@
 				var searchParams = _.omitBy(this.searchForm, (item) => item == "" || _.isNil(item));
 				searchParams.page = this.page - 1;
 				searchParams.size = this.pageSize;
-				searchParams.sort="name";
+				searchParams.sort="groupName";
 				searchParams.order="asc";			
 
 				this._getBlackList(searchParams);
@@ -242,7 +248,7 @@
 					type: 'warning'
 				}).then(() => {
 					
-					let cardNos = this.sels.map(item => item.cardNo);
+					let cardNos = this.sels.map(item => ({cardNo:item.cardNo, groupId:item.groupId}));
 					
                     AdminAPI.removeBlacklist(cardNos).then((data) => {                    	
 						this.$message({
@@ -263,6 +269,7 @@
 		},
 		mounted() {
 			this.getBlackList();
+			this.getDeviceGroup();
 		}
 	}
 </script>

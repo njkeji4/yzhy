@@ -1,124 +1,133 @@
 <template>
-	<el-dialog title="批量导入黑名单" ref="modal" :visible.sync="modalVisible" :close-on-click-modal="false" 
-        class="deivce-batch-add-dialog">
+	<el-dialog title="批量上传" ref="modal" :visible.sync="modalVisible" 
+		:close-on-click-modal="false"
+		class="add-device-form">
 
-		<el-row :gutter="0">         
-            <el-col :span="24">                
-                <div class="cmcc-info-text">注意:导入的文件为excel文件</div>
-                <div class="cmcc-info-text" style="margin-bottom:30px;">里面包含下面三列，从第二行开始导入数据<br>
-                    姓名,身份证，性别<br>
-                </div>
+		<el-form ref="form" :model="form" :rules="uploadformrules">
+			
+		<el-form-item class="file-wrap" prop="file">
 
-                <el-upload  style="float:right;"
-                    ref="fileUpload"
-                    name="uploadFile"
-                    accept=".xls,.xlsx"
-                    :multiple="false"
-                    :action="batchAddUploadURL"
-                    :on-success="uploadFileSuccess"
-                    :on-error="uploadFileError"
-                    :before-upload="uploadFileBeforeUpload">
-                    <el-button type="primary" slot="trigger" size="small" :loading="loading">导入数据</el-button>
-                </el-upload>
-                       
-            </el-col>
-		</el-row>
+			<el-upload class='ensure' 
+				ref="uploadForm"
+				name="uploadFile"
+                accept=".xls,.xlsx"
+				:data="dataParams"
+				:action="uploadUrl"  
+				:auto-upload="false"				
+				:on-success="uploadSuc"
+				:on-change="onchange"
+				>
+				<div>
+				<el-button size="small" type="primary">请选择文件</el-button>
+				<div  class="el-upload__tip">
+                    文件包含三列，从第二行开始导入数据:
+                    姓名， 身份证，性别
+                </div>	
+				</div>			
+	
+			</el-upload>
+		</el-form-item>
+
+		<el-form-item label="适用组" prop="groups" >
+				<el-select clearable v-model="form.groups" multiple placeholder="请选择">
+					<el-option v-for="item in groups" :label="item.groupName" :value="item.groupId"></el-option>
+				</el-select>
+		</el-form-item>
+		
+		<el-form-item class="subbut">
+			<el-button size="small" @click="modalVisible = false">取消</el-button>
+			<el-button size="small" type="primary" 
+				@click="uploadSubmit">提交</el-button>
+		</el-form-item >
+		
+	</el-form>
 	</el-dialog>
 </template>
 
 <script>
-	import { mapGetters } from 'vuex';
-
+	/* eslint-disable */
+	
+	import { mapGetters } from 'vuex';	
 	import { AdminAPI } from '../../api';
 
-    import * as _ from 'lodash';
-
-    export default {
-        data() {
-            return {
-                modalVisible: true,
-                loading: false,               
-                batchAddUploadURL: AdminAPI.uploadBlackListUrl,               
-            }
-        },
-        computed: {           
-        },
-        watch:{			
+	export default {
+		
+		data: function() {
+			return { // add				
+				form: {                   
+                    file: '',
+					groups:[],
+                },
+                dataParams:{groups:[]},               
+				uploadUrl:AdminAPI.uploadBlackListUrl,
+				modalVisible: true,
+				submitLoading: false,
+				disabled:true,
+				versions:['1','2'],				
+				fileList:[],
+				uploadformrules: {
+						groups:[
+							{ required: true, message: '选择适用的设备组', trigger: 'change' },
+						]
+				},
+			}
 		},
-        methods: {
-            uploadFileSuccess(data) {
-                if(data.status === 0) {
-                    this.deviceInfoList = data.data.devices;
-                    this.$message({
-                        message: '文件导入成功!',
-                        type: 'success',
-                    });
-                    this.$refs.fileUpload.clearFiles();
-                } else {
-                    this.$message.error(data.msg);
-                }
-            },
-            uploadFileError(data) {
-                this.$message.error('文件导入失败!');
-            },
-            uploadFileBeforeUpload(file) {
-                const suffix = file.name.substring(file.name.length-3);
-                if(suffix !== 'xls' && suffix !== 'xlsx'){
-                    this.$message.error('选择excel文件上传');
-                    return false;
-                }
-                return this.$confirm('是否确定导入文件?', '导入文件', {
-                    confirmButtonText: '导入',
-                    cancelButtonText: '取消',
-                    type: 'info'
-                });
-            },
-            save() {
-               
-            },
-            cancel() {
-               
-            },
-        },
-    }
-</script>
-<style scoped lang="scss">
-.el-col {
-    height: 400px;
-    position: relative;
-}
-.el-progress {
-    position: absolute;
-    bottom: 3em;
-    left: 0;
-    width: 100%;
-}
-.cmcc-action-wrap {
-    margin: 5px 0 0;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-}
-.cmcc-info-text,
-.cmcc-info-warn {
-    font-size: 0.9em;
-    margin-bottom: 5px;
-}
-.cmcc-info-warn {
-    color: #f00;
-}
-.upload {
-    display: inline-block;
-}
-</style>
+		computed: {
+			
+		},
+		methods: {		
+			
+			uploadSuc(res, file, fileList){
+				if(res.status === 0){
+					this.modalVisible = false;
+					console.log('suc',res)
+					this.$message({
+						message: '上传成功!',
+						type: 'success'
+					});
+					this.$emit('data', {result: 'success'});
+				}else{
+					this.$message.error('上传文件失败!'+res.msg);
+				}
+			},
+			onchange(file,fileList){				
+				this.fileList = fileList;				
+			},
 
-<style lang="scss">
-.deivce-batch-add-dialog {
-    .el-dialog {
-        width: 400px;
-        height: 250px;
-    }
-}
+			uploadSubmit() {
+				 this.$refs.form.validate((valid) => {
+					this.dataParams.groups = this.form.groups;
+					 if(this.fileList.length > 1){
+						this.$message.error('一次上传一个文件');
+						return;
+					 }
+					this.$refs.uploadForm.submit();
+					
+				 });
+			},			
+		},
+		
+		mounted() {
+			
+		}
+	}
+</script>
+
+<style scoped lang="scss">
+	
+	.el-dialog{
+		width:400px;
+	}
+
+	.el-upload__tip {
+		display: inline-block;
+		padding-left: 20px;
+	}
+	.subbut{
+		text-align: right;
+		margin: 22px 0 0 0;
+	}
+	.el-input,.el-select{
+		width:400px !important;
+	}
 </style>

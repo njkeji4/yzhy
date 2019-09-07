@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shicha.yzmgt.bean.BlackList;
+import com.shicha.yzmgt.bean.DeviceGroup;
 import com.shicha.yzmgt.bean.Version;
+import com.shicha.yzmgt.dao.IDeviceGroupDao;
 import com.shicha.yzmgt.domain.APIResult;
 import com.shicha.yzmgt.domain.SearchBlacklist;
 import com.shicha.yzmgt.service.BlacklistService;
@@ -46,13 +49,29 @@ public class BlacklistCtronller {
 	@Autowired
 	BlacklistService blackListService;
 	
+	@Autowired
+	IDeviceGroupDao deviceGroupDao;
+	
 	@RequestMapping(value="/add", method=RequestMethod.POST)
 	public APIResult addUser(
 			@RequestBody BlackList blacklist,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{
 		
-		blacklist.setUserName((String)req.getSession().getAttribute("userName"));
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		
+		blacklist.setUserName(userName);
+		if(blacklist.getGroupId() == null) {
+			log.info("group id is null");
+			return new APIResult(1,"groupId is null");
+		}
+		
+		DeviceGroup group = deviceGroupDao.findByGroupId(blacklist.getGroupId());
+		if(group == null) {
+			log.info("group  is null");
+			return new APIResult(1,"group is null:"+blacklist.getGroupId());
+		}
+		
+		blacklist.setGroupName(group.getGroupName());
 		blackListService.save(blacklist);
 
 		return new APIResult(0);
@@ -60,31 +79,15 @@ public class BlacklistCtronller {
 	
 	@RequestMapping(value="/delete", method=RequestMethod.POST)
 	public APIResult delUser(
-			@RequestBody String[] ids,
+			@RequestBody SearchBlacklist[] filters,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{
 		
-		blackListService.remove(ids, (String)req.getSession().getAttribute("userName"));
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		blackListService.remove(filters, userName);
 
 		return new APIResult(0);
 	}
-	
-//	@RequestMapping(value="/list", method=RequestMethod.GET)
-//	public List<BlackList> getVersions(			
-//			HttpServletRequest req, HttpServletResponse response) throws IOException{
-//		
-//		List<BlackList> list= blackListService.getall();
-//		
-//		return list;
-//	}
-	
-//	@RequestMapping(value="/export", method=RequestMethod.GET)
-//	public APIResult getVersions(			
-//			HttpServletRequest req, HttpServletResponse response) throws IOException{
-//		
-//		String filename = "black_list_export_" + Util.formatDate() + ".csv";
-//		
-//		return new APIResult(0,"",filename);
-//	}
 	
 	@RequestMapping(value="/export", method=RequestMethod.GET)
 	public void groups(
@@ -122,7 +125,9 @@ public class BlacklistCtronller {
 			@RequestBody SearchBlacklist filter,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{		
 		
-		Page<BlackList> blackList = blackListService.searchList(filter,(String)req.getSession().getAttribute("userName"));
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		Page<BlackList> blackList = blackListService.searchList(filter,userName);
 		
 		return new APIResult(0, "", blackList);		
 	}
@@ -130,13 +135,18 @@ public class BlacklistCtronller {
 	@RequestMapping(value="/upload", method=RequestMethod.POST)
 	public APIResult uploadBlacklist(
 			@RequestParam("uploadFile") MultipartFile file,			
+			@RequestParam("groups") String[] groups,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{
 		
-		boolean result = blackListService.importBlacklistFromFile(file, (String)req.getSession().getAttribute("userName"));
 		
-		if(result)
-			return new APIResult(0);
-		else
-			return new APIResult(1, "导入文件失败");
+			String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+			
+			boolean result = blackListService.importBlacklistFromFile(file, groups, userName);
+			
+			if(result)
+				return new APIResult(0);
+			else
+				return new APIResult(1, "导入文件失败");
+		
 	}
 }

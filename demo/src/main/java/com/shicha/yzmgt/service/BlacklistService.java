@@ -2,6 +2,7 @@ package com.shicha.yzmgt.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,9 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shicha.yzmgt.bean.BlackList;
 import com.shicha.yzmgt.bean.Device;
+import com.shicha.yzmgt.bean.DeviceGroup;
 import com.shicha.yzmgt.bean.User;
 import com.shicha.yzmgt.dao.IBlaclistDao;
 import com.shicha.yzmgt.dao.ICheckData;
+import com.shicha.yzmgt.dao.IDeviceDao;
+import com.shicha.yzmgt.dao.IDeviceGroupDao;
 import com.shicha.yzmgt.dao.IUserDao;
 import com.shicha.yzmgt.domain.SearchBlacklist;
 
@@ -39,17 +43,24 @@ public class BlacklistService {
 	IBlaclistDao blackListDao;
 	
 	@Autowired
+	IDeviceDao deviceDao;
+	
+	@Autowired
 	IUserDao userDao;
 	
+	@Autowired
+	IDeviceGroupDao deviceGroupDao;
+	
 	public void save(BlackList blacklist) {
+		
 		blacklist.setCreateTime(System.currentTimeMillis());
 		blackListDao.save(blacklist);
 	}
 	
-	public void remove(String[] ids, String userName) {
-		
-		for(String id: ids) {
-			blackListDao.deletebyCardNo(id, userName);
+	public void remove(SearchBlacklist[] filters, String userName) {
+		Long current = System.currentTimeMillis();
+		for(SearchBlacklist filter: filters) {
+			blackListDao.deletebyCardNoAndGroupId(filter.getCardNo(), filter.getGroupId(), current, userName);
 		}
 	}
 	
@@ -79,7 +90,9 @@ public class BlacklistService {
 		blackList.setBirthday(filter.getBirthday());
 		blackList.setCardNo(filter.getCardNo());
 		blackList.setSex(filter.getSex());
-		blackList.setFolk(filter.getFolk());	
+		blackList.setFolk(filter.getFolk());
+		blackList.setGroupName(filter.getGroupName());
+		
 		if(user != null && !user.getRole().equals(User.ROLE_ADMIN)) {
 			blackList.setUserName(userName);
 		}
@@ -92,26 +105,43 @@ public class BlacklistService {
 		return blackListDao.findAll(example, pageable);
 	}
 	
-	public boolean importBlacklistFromFile(MultipartFile file, String userName) {
+	public boolean importBlacklistFromFile(MultipartFile file, String[]groupIds, String userName) {
 		
 		String fname = file.getOriginalFilename();
 		if(fname.length() <= 3) {
 			return false;
 		}
 		
+		List<DeviceGroup> groups=new ArrayList<DeviceGroup>();
+		for(String id : groupIds) {
+			DeviceGroup group = deviceGroupDao.findByGroupId(id);
+			if(group == null)continue;
+			
+			groups.add(group);
+		}
+		
 		Workbook wb = null;		
 		String last3str = fname.substring(fname.length() - 3);
 		try {
+			
+			boolean is2003 = true;
 			if(last3str.equals("xls")) {	//<=excel2003
 				wb = new HSSFWorkbook(file.getInputStream());
 			}else {	//excel 2007
 				wb = new XSSFWorkbook(file.getInputStream());
+				is2003 = false;
 			}
 			Sheet sheet = wb.getSheetAt(0);
+			int lastRowNum = sheet.getLastRowNum();
+//			if(is2003) {
+//				lastRowNum++;
+//			}
+			
+			log.info("lastrownumber:"+lastRowNum);
 			
 			List<BlackList> bl = new ArrayList<BlackList>();
 			
-			for(int i = 1; i < sheet.getLastRowNum(); i++) {
+			for(int i = 1; i <= lastRowNum; i++) {
 				Row row = sheet.getRow(i);
 				
 				String name = row.getCell(0).getStringCellValue();
@@ -125,12 +155,14 @@ public class BlacklistService {
 				if(sexStr.equals("女")) {
 					sex = 2;
 				}
-				bl.add(new BlackList(cardNo, name, sex, userName));
+				
+				for(DeviceGroup g : groups)
+					bl.add(new BlackList(cardNo, name, sex, userName, g.getGroupId(), g.getGroupName()));
 			}
 			
-			blackListDao.saveAll(bl);
-			
 			wb.close();
+			
+			blackListDao.saveAll(bl);
 			
 			return true;
 			
@@ -140,4 +172,19 @@ public class BlacklistService {
 		}		
 	}
 	
+	public List<BlackList> getBlackList(String deviceNo, Long time){
+		
+		Optional<Device> opt = deviceDao.findByDeviceNo(deviceNo);
+		if(!opt.isPresent()) {
+			log.info("device is not existed:" + deviceNo);
+			return null;
+		}
+		Device device = opt.get();
+		
+		if(time == 0) {
+			return blackListDao.findAllByGroupIdAndCreateTimeGreaterThanEqualAndStatus(device.getGroupId(), time, 0);
+		}
+		
+		return blackListDao.findAllByGroupIdAndCreateTimeGreaterThanEqual(device.getGroupId(), time);
+	}
 }

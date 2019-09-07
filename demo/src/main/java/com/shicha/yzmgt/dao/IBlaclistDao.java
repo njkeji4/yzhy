@@ -18,11 +18,17 @@ public interface IBlaclistDao extends JpaRepository<BlackList, String>{
 	
 	List<BlackList> findByUserName(String userName);
 	
-	public BlackList findByCardNoAndDeleted(String cardNo, int deleted);
+	public BlackList findByCardNoAndStatus(String cardNo, int status);
+	
+	
+	List<BlackList> findAllByGroupIdAndCreateTimeGreaterThanEqual(String groupId, Long create);
+	
+	List<BlackList> findAllByGroupIdAndCreateTimeGreaterThanEqualAndStatus(String groupId, Long time, int status);
 	
 	
 	@Transactional
 	@Modifying
-	@Query(value="update black_list set deleted = 1, userName=:userName where card_no=:cardNo",nativeQuery=true)
-	public void deletebyCardNo(@Param("cardNo") String cardNo, @Param("userName") String userName);
+	@Query(value="update black_list set status = 1, user_name=:userName, create_time=:deleteTime where card_no=:cardNo and group_id=:groupId",nativeQuery=true)
+	public void deletebyCardNoAndGroupId(@Param("cardNo") String cardNo, @Param("groupId") String groupId,
+			@Param("deleteTime") Long deleteTime,@Param("userName") String userName);
 }

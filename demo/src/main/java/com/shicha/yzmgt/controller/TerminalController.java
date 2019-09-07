@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.shicha.yzmgt.bean.AdResult;
+import com.shicha.yzmgt.bean.BlackList;
 import com.shicha.yzmgt.bean.CheckData;
 import com.shicha.yzmgt.bean.Device;
 //import com.shicha.yzmgt.bean.DeviceLog;
@@ -26,10 +27,12 @@ import com.shicha.yzmgt.bean.Version;
 import com.shicha.yzmgt.domain.APIResult;
 import com.shicha.yzmgt.domain.AdvRequest;
 import com.shicha.yzmgt.domain.AdvResponse;
+import com.shicha.yzmgt.domain.BlacklistResponse;
 import com.shicha.yzmgt.domain.DeviceRespond;
 import com.shicha.yzmgt.domain.GetVersionReq;
 import com.shicha.yzmgt.domain.PersonIncrement;
 import com.shicha.yzmgt.service.AdverService;
+import com.shicha.yzmgt.service.BlacklistService;
 import com.shicha.yzmgt.service.CheckDataService;
 //import com.shicha.yzmgt.service.DeviceLogService;
 import com.shicha.yzmgt.service.DeviceService;
@@ -45,6 +48,9 @@ public class TerminalController {
 	
 	@Autowired
 	DeviceService deviceService;
+	
+	@Autowired
+	BlacklistService blackListService;
 	
 	@Autowired
 	VersionService versionService;
@@ -150,5 +156,17 @@ public class TerminalController {
 			return advService.reportResult(result);
 			
 			//return new APIResult(0);
+	}
+	
+	@RequestMapping(value="/blacklist", method=RequestMethod.POST)
+	public BlacklistResponse getBlacklist(
+			@RequestBody AdvRequest blackReq,
+			HttpServletRequest req, HttpServletResponse response) throws IOException{
+		
+			log.info("request:"+JSON.toJSONString(blackReq));
+		
+			List<BlackList>list= blackListService.getBlackList(blackReq.getDeviceNo(),  blackReq.getTimestamp());
+			
+			return new BlacklistResponse(list);
 	}
 }

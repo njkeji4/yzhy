@@ -234,7 +234,7 @@ public class CheckDataService {
 	public boolean checkAlarm(CheckData data) {		
 		
 		String cardNo = data.getCardNo();
-		BlackList bl = blacklistDao.findByCardNoAndDeleted(cardNo, 0);		
+		BlackList bl = blacklistDao.findByCardNoAndStatus(cardNo, 0);		
 		if(bl != null) {	//the user is in blacklist
 			AlarmData alarmData = new AlarmData(data);
 			alarmData.setAlarmTime(System.currentTimeMillis());

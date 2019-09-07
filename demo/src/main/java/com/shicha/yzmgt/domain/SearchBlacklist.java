@@ -4,6 +4,8 @@ public class SearchBlacklist {
 
 	String cardNo;	
 	String name;
+	String groupName;
+	String groupId;
 	
 	String folk;
 	Integer sex;
@@ -12,8 +14,8 @@ public class SearchBlacklist {
 	
 	Integer page = 0;
 	Integer size = 10;
-	String sort="name";
-	String order = "asc";//"dsc"
+	String sort="groupName";
+	String order = "asc";//"desc"
 	
 	public String getCardNo() {
 		return cardNo;
@@ -74,5 +76,18 @@ public class SearchBlacklist {
 	}
 	public void setOrder(String order) {
 		this.order = order;
+	}
+	public String getGroupName() {
+		return groupName;
+	}
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}	
+	
 }

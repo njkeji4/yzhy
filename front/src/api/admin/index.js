@@ -4,13 +4,12 @@ import { prefix } from '../apiConfig';
 
 //user
 export const login = params => { return axios.post(`${prefix}/user/login`, params); };
-
-
 export const logout = () => { return axios.post(`${prefix}/user/logout`); };
-
-
 export const getUserList = () => { return axios.get(`${prefix}/user/list`); };
-
+export const unlock = params => { return axios.post(`${prefix}/user/unlock`, params); };
+export const changePassword = (param) => { return axios.post(`${prefix}/user/changepassword`,param); };
+export const addUser = (param) => { return axios.post(`${prefix}/user/add`,param); };
+export const removeUsers = (param) => { return axios.post(`${prefix}/user/delete`,param); };
 
 //device
 export const getDeviceList = () => { return axios.get(`${prefix}/device/list?_t=${Date.now()}`); };
@@ -27,19 +26,10 @@ export const addGroup = (param) => { return axios.post(`${prefix}/devicegroup/ad
 export const editGroup = (param) => { return axios.post(`${prefix}/devicegroup/update`,param); };
 export const removeGroup = (param) => { return axios.post(`${prefix}/devicegroup/delete`,param); };
 
-
 //check data
 export const searchCheckData = (param) => { return axios.post(`${prefix}/checkdata/search`,param); };
 
 export const getSpotImg = (id) => { return axios.get(`${prefix}/checkdata/spotimg?id=${id}&_t=${Date.now()}`); };
-
-
-//user
-export const changePassword = (param) => { return axios.post(`${prefix}/user/changepassword`,param); };
-
-export const addUser = (param) => { return axios.post(`${prefix}/user/add`,param); };
-
-export const removeUsers = (param) => { return axios.post(`${prefix}/user/delete`,param); };
 
 //version
 export const getVersionList = () => { return axios.get(`${prefix}/version/list?_t=${Date.now()}`); };

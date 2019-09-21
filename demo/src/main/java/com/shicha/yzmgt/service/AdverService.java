@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.shicha.yzmgt.bean.AdResult;
@@ -38,6 +41,7 @@ import com.shicha.yzmgt.dao.IAdvDao;
 import com.shicha.yzmgt.dao.IBlaclistDao;
 import com.shicha.yzmgt.dao.IDeviceDao;
 import com.shicha.yzmgt.dao.IDeviceGroupDao;
+import com.shicha.yzmgt.dao.IUserDao;
 import com.shicha.yzmgt.domain.APIResult;
 import com.shicha.yzmgt.domain.AdvRequest;
 import com.shicha.yzmgt.domain.AdvResponse;
@@ -57,6 +61,9 @@ public class AdverService {
 	
 	@Autowired
 	IDeviceDao deviceDao;
+	
+	@Autowired
+	IUserDao userDao;
 	
 	@Autowired
 	IDeviceGroupDao deviceGroupDao;
@@ -140,25 +147,29 @@ public class AdverService {
 			adv.setBetrween2(System.currentTimeMillis());
 		}
 		
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = userDao.findByName(userName);
+		
 		return advDao.findAll(new Specification<Advertise>() {
 
 			@Override
 			public Predicate toPredicate(Root<Advertise> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
 				List<Predicate> predicatesList = new ArrayList<>();
 				
-				if(adv.getAdvType() != null) {
-					predicatesList.add(builder.and(
-							builder.equal(root.get("advType"), adv.getAdvType())
-							));
-				}
-				
 				predicatesList.add(builder.and(
 						builder.equal(root.get("status"), Advertise.status_new)
 						));
 				
-				if(adv.getRequested() != null) {
+				if(user != null && !user.getRole().equals(User.ROLE_ADMIN)) {
+					
 					predicatesList.add(builder.and(
-							builder.equal(root.get("requested"), adv.getRequested())
+							builder.equal(root.get("createUser"), userName)
+							));
+				}
+				
+				if(adv.getAdvType() != null) {
+					predicatesList.add(builder.and(
+							builder.equal(root.get("advType"), adv.getAdvType())
 							));
 				}
 				
@@ -249,12 +260,12 @@ public class AdverService {
 				}	
 				if(adv.getAdTitle() != null) {
 					predicatesList.add(builder.and(
-							builder.like(root.get("adTitle"), adv.getAdTitle())
+							builder.like(root.get("adTitle"), "%" + adv.getAdTitle() + "%")
 						));
 				}
 				if(adv.getDeviceName() != null) {
 					predicatesList.add(builder.and(
-							builder.like(root.get("deviceName"), adv.getDeviceName())
+							builder.like(root.get("deviceName"), "%" + adv.getDeviceName()+ "%")
 						));
 				}
 				

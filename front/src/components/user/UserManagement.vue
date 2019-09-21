@@ -6,6 +6,7 @@
 			<el-col  :span=60 class="search-action-wrap" style="margin-bottom:10px;">
 				<div>		
 					<el-button size="small" @click="batchRemove" :disabled="this.sels.length === 0">删除用户</el-button>
+					<el-button size="small" @click="unlockUser" :disabled="this.sels.length === 0">解锁用户</el-button>
 					<el-button size="small" @click="addUser">增加用户</el-button>					
 				</div>				
 				
@@ -117,6 +118,27 @@
 				}).catch(() => {
 					this.$message.error('添加用户成功失败!');
 				});
+			},
+			unlockUser(){
+				let names =this.sels.map(item => item.name);
+				AdminAPI.unlock(
+						names
+					).then(({data}) => {								
+						if(data.status === 0){
+							this.$message({
+								message: '解锁成功!',
+								type: 'success'
+							});
+							this.getUserList();
+						}else{
+							this.$message({
+								message: '解锁失败!',
+								type: 'error'
+							});
+						}
+					}).catch((error) => {
+						this.$message.error(error);
+					});
 			},
 			batchRemove(){
 				let flag = false;

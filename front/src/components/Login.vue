@@ -111,7 +111,7 @@
                         });
                       }else{            
                         this.$message({
-                              message: "用户名密码不正确",
+                              message: data.msg,
                               type: 'error'
                             });
                       }

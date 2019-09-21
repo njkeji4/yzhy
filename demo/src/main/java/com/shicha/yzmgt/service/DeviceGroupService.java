@@ -71,7 +71,21 @@ public class DeviceGroupService {
 	}
 	
 	public List<DeviceGroup> searchDeviceGroup(){
-		return groupDao.findAll();
+		
+		List<DeviceGroup>stat = deviceDao.getDeviceCountByGroup();
+		List<DeviceGroup>result = groupDao.findAll();
+		
+		for(DeviceGroup r : result) {
+			
+			for(DeviceGroup t : stat) {
+				if(r.getGroupId().equals(t.getGroupId())) {
+					r.setDeviceCount(t.getDeviceCount());
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	public Page<DeviceGroup> searchDeviceGroup(SearchDeviceGroup search){

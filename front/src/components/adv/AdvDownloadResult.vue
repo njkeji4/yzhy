@@ -1,13 +1,22 @@
 <template>
 	<div class="main-content">
 
-		<el-row class="toolbar searchparam">			
-			<el-col  :span=60 class="search-action-wrap" style="margin-bottom:10px;">
-				<div>
+		<div style="float:left">
+			<el-form :inline="true" size="small" :model="searchForm" class="search-form" label-width="6em" ref="searchForm">
+				<el-form-item label="" prop="deviceName">
+					<el-input size="small" v-model="searchForm.deviceName" placeholder="设备名称"></el-input>
+				</el-form-item>
+				
+				<el-form-item label="" prop="adTitle">
+					<el-input size="small" v-model="searchForm.adTitle" placeholder="广告名称"></el-input>
+				</el-form-item>
+
+				<el-button size="small" @click="searchAdv">查询</el-button>	
+				<el-button size="small" @click="reset">清除</el-button>					
 					
-				</div>				
-			</el-col>
-		</el-row>
+			</el-form>
+		</div>
+		
 		
 		<section class="grid-content">
 			<el-table resizable border highlight-current-row stripe class="cmcc-cell-nowrap" ref="table" 
@@ -58,6 +67,10 @@
 	export default {
 		data() {
 			return {
+				searchForm: { 
+					deviceName:'',
+					adTitle:''
+				},
 				total: 0,
 				page: 1,
 				pageSize: 10,
@@ -81,6 +94,13 @@
 			}
 		},
 		methods: {
+			reset() {
+				this.$refs.searchForm.resetFields();
+			},
+			searchAdv() {
+				this.page = 1;
+				this.getAdvList();
+			},
 			handleSizeChange(size) {
 				this.pageSize = size;
 				this.handleCurrentChange(1);
@@ -105,7 +125,7 @@
 			},
 
 			getAdvList() {
-				let param = {};
+				var param = _.omitBy(this.searchForm, (item) => item == "" || _.isNil(item));
 				param.page = this.page - 1;
 				param.size = this.pageSize;
 				param.sort= this.sort;

@@ -18,12 +18,20 @@ public class LoginFailHandler implements AuthenticationFailureHandler{
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
+		
+		response.setCharacterEncoding("utf-8");
 		response.setContentType("application/json);charset=utf-8");
 		
 		PrintWriter out = response.getWriter();
 		
+		String msg = exception.getMessage();
 		
-		out.write("{\"status\":1,\"msg\":\"user name or password incorrect\"}");
+		int status = User.USER_STATUS_UNKNOWN;
+		if(exception instanceof AccoutExceptionWithStatus)
+			status = ((AccoutExceptionWithStatus)exception).getStatus();
+		
+		
+		out.write("{\"status\":"+status+",\"msg\":\""+ msg + "\"}");
 		out.flush();
 		out.close();
 	}

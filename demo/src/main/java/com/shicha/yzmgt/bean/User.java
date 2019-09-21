@@ -25,6 +25,17 @@ public class User {
 	public static String ROLE_NORMAL="ROLE_NORMAL";
 	public static String ROLE_="ROLE_AD";
 
+	public static int USER_STATUS_OK = 0;	
+	public static int USER_STATUS_LOCK = 1;
+	public static int USER_STATUS_ERRORPWD = 2;
+	
+	public static int USER_STATUS_NOTEXISTED = 100;
+	public static int USER_STATUS_UNKNOWN = 101;
+	
+	
+	public static int USER_MAX_ERROR_TIMES = 5;
+	
+	
 	@Id
 	@Column(name="id", nullable=false, length=36)
 	@GenericGenerator(name="system-uuid", strategy="uuid2")
@@ -37,6 +48,12 @@ public class User {
 	
 	String phone;
 	
+	@Column(nullable=false, columnDefinition="INT default 0")
+	int status = 0;
+	
+	@Column(nullable=false, columnDefinition="INT default 0")
+	int errorTimes = 0;
+	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name="group_user", joinColumns=@JoinColumn(name="user_id", referencedColumnName="id"), inverseJoinColumns = @JoinColumn(name="group_id", referencedColumnName="group_id"))	
 	List<DeviceGroup> groups;
@@ -48,8 +65,6 @@ public class User {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	
-	
 	
 	public void addGroup(DeviceGroup group) {
 		if(groups == null) {
@@ -97,4 +112,21 @@ public class User {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	public int getErrorTimes() {
+		return errorTimes;
+	}
+
+	public void setErrorTimes(int errorTimes) {
+		this.errorTimes = errorTimes;
+	}
+	
 }

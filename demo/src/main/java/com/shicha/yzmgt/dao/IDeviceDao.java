@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.shicha.yzmgt.bean.Device;
+import com.shicha.yzmgt.bean.DeviceGroup;
 import com.shicha.yzmgt.domain.TodayData;
 
 @Repository
@@ -55,6 +56,12 @@ public interface IDeviceDao extends JpaRepository<Device, String>,JpaSpecificati
 		+ ") from device where groupId in ?1")
 	TodayData selectTodayStatistics(List<String>groupIds);
 	
+	
+	@Transactional
+	@Query(value="select new com.shicha.yzmgt.bean.DeviceGroup("		
+		+ "count(*) as deviceCount, groupId"
+		+ ") from device group by groupId")
+	List<DeviceGroup> getDeviceCountByGroup();
 }
 
 

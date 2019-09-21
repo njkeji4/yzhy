@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -79,6 +80,18 @@ public class UserController {
 		userService.updateUser(user);
 
 		return new APIResult(0);
+	}
+	
+	@RequestMapping(value="/unlock", method=RequestMethod.POST)
+	public APIResult unLock(
+			@RequestBody String[] names,
+			HttpServletRequest req, HttpServletResponse response) throws IOException{
+		
+		
+		if(userService.unLock(names))
+			return new APIResult(0);
+		else
+			return new APIResult(1, "管理员登陆后解锁");
 	}
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)

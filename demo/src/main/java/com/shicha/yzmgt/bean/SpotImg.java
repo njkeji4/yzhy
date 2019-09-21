@@ -8,11 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity(name="spot_img")
+@Table(indexes={
+		@Index(name="compare_date_idx",columnList="compareDate")
+	})
 public class SpotImg {
 
 	@Id
@@ -21,7 +26,8 @@ public class SpotImg {
 	
 	@Lob @Basic(fetch=FetchType.LAZY)
 	byte[] spotImg;
-
+	
+	Long compareDate;
 	
 	public SpotImg() {}
 	
@@ -45,5 +51,12 @@ public class SpotImg {
 	public void setSpotImg(byte[] spotImg) {
 		this.spotImg = spotImg;
 	}
-	
+
+	public Long getCompareDate() {
+		return compareDate;
+	}
+
+	public void setCompareDate(Long compareDate) {
+		this.compareDate = compareDate;
+	}
 }

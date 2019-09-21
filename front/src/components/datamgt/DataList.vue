@@ -21,7 +21,8 @@
 					</el-form-item>				
 
 					<el-form-item class="date-range" label="" prop="dateTimeRange" label-width="6.5em">
-							<el-date-picker size="small" v-model="searchForm.dateTimeRange" type="daterange" 
+							<el-date-picker size="small" v-model="searchForm.dateTimeRange" 
+								type="datetimerange"
 								range-separator="至"
 								start-placeholder="比对开始日期"
 								end-placeholder="比对结束日期">

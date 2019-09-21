@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -75,6 +76,31 @@ public class UserService {
 		
 		existedUser.setGroups(user.getGroups());
 		userDao.save(existedUser);
+	}
+	
+	public boolean unLock(String[] names) {
+		
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		if(userName == null ) {
+			return false;
+		}
+		User loginUser = userDao.findByName(userName);
+		if(!loginUser.getRole().equals(User.ROLE_ADMIN)) {
+			return false;
+		}
+		
+		for(String name : names) {
+			User tobeUnlocked = userDao.findByName(name);
+			if(tobeUnlocked == null) {
+				log.info("the user is not existed:" + name);
+				continue;
+			}
+			
+			tobeUnlocked.setStatus(User.USER_STATUS_OK);
+			tobeUnlocked.setErrorTimes(0);
+			userDao.save(tobeUnlocked);
+		}
+		return true;
 	}
 	
 	public User getUser(String name) {

@@ -102,6 +102,11 @@ public class DeviceService {
 							builder.equal(root.get("status"), device.getStatus())
 							));
 				}
+				if(device.getGroupId() != null) {
+					predicatesList.add(builder.and(
+							builder.equal(root.get("groupId"), device.getGroupId())
+							));
+				}
 				
 				return builder.and(
 	                    predicatesList.toArray(new Predicate[predicatesList.size()]));

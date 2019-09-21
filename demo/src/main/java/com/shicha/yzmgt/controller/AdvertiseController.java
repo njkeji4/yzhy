@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -104,6 +105,8 @@ public class AdvertiseController {
 	public APIResult searchAdv(
 			@RequestBody SearchAdv adv,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{
+		
+		//String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 			Page<Advertise> ads = advService.searchAdv(adv);
 			

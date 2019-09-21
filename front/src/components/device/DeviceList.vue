@@ -10,7 +10,7 @@
 				
 			</el-col>
 
-			<el-col :span=15 class="paramleft">
+			<el-col :span=19 class="paramleft">
 				<el-form :inline="true" size="small" :model="searchForm" class="search-form" label-width="6em" ref="searchForm">
 					<el-form-item label="" prop="name">
 						<el-input size="small" v-model="searchForm.name" placeholder="设备名称"></el-input>
@@ -18,6 +18,12 @@
 					<el-form-item label="" prop="deviceNo">
 						<el-input size="small" v-model="searchForm.deviceNo" placeholder="设备编号"></el-input>
 					</el-form-item>
+					 <el-form-item label="" prop="groupId" >
+						<el-select clearable v-model="searchForm.groupId" placeholder="选择组">
+							<el-option v-for="item in groups" :label="item.groupName" :value="item.groupId"></el-option>
+						</el-select>
+					</el-form-item>
+					
 					<el-form-item label="" prop="status">
 						<el-select clearable size="small" v-model="searchForm.status" placeholder="状态">
 							<el-option  label="在线" value="0"></el-option>
@@ -44,17 +50,17 @@
 				<el-table-column header-align="center"  type="selection">				
 				</el-table-column>
 				
-				<el-table-column   prop="name" label="设备名称" width="240"></el-table-column>
+				<el-table-column  sortable="custom" prop="name" label="设备名称" width="240"></el-table-column>
 				
-				<el-table-column  prop="groupId" label="所属组" width="240">
+				<el-table-column  prop="groupId" label="所属组" width="240" sortable="custom">
 					<template slot-scope="scope">
 						{{scope.row.groupId | groupIdFormat(groupMaps)}}
 					</template>
 				</el-table-column>
 				
-				<el-table-column  prop="deviceNo" label="设备编号" width="200"></el-table-column>				
+				<el-table-column  prop="deviceNo" label="设备编号" width="200" sortable="custom"></el-table-column>				
 						
-				<el-table-column  prop="status" label="设备状态" width="100">
+				<el-table-column  prop="status" label="设备状态" width="120" sortable="custom">
 					<template slot-scope="scope">						
 						<el-tag :type="scope.row.status == '0' ? 'success' : 'danger'" close-transition>{{scope.row.status == '0'?'在线':'离线'}}</el-tag>					
 					</template>
@@ -65,7 +71,7 @@
 				<el-table-column  sortable="custom" prop="totalSuccCount" label="认证总数" width="150">
 				</el-table-column>	
 
-				<el-table-column  prop="versionNo" label="客户端版本" >
+				<el-table-column  prop="versionNo" label="客户端版本" sortable="custom">
 				</el-table-column>			
 				
 			</el-table>
@@ -101,7 +107,8 @@
 					name:'',
 					versionNo:'',
 					deviceNo:'',
-					status:''
+					status:'',
+					groupId:''
 				},
 				groups:[],
 				groupMaps:{},

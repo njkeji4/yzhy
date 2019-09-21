@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -29,6 +30,16 @@ public class DeviceGroup {
 	String groupName;
 	
 	Long createTime;
+	
+	@Transient
+	long deviceCount;
+	
+	public DeviceGroup() {}
+	
+	public DeviceGroup(long deviceCount,String groupId) {
+		this.groupId = groupId;
+		this.deviceCount = deviceCount;
+	}
 
 	public String getGroupId() {
 		return groupId;
@@ -53,4 +64,13 @@ public class DeviceGroup {
 	public void setCreateTime(Long createTime) {
 		this.createTime = createTime;
 	}
+
+	public long getDeviceCount() {
+		return deviceCount;
+	}
+
+	public void setDeviceCount(long deviceCount) {
+		this.deviceCount = deviceCount;
+	}
 }
+

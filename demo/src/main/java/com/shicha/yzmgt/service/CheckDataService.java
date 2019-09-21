@@ -99,53 +99,6 @@ public class CheckDataService {
 	@PersistenceContext
     private EntityManager em;
 	
-	//these devices should only have one compare records in one day
-//	@Value("${devices}")
-//	List<String>devices;
-	
-	/**this function is here because a special requirement:
-	 * some devices(in the deivces list above),should only use once for one person a day.
-	 * if a person use the device 2 or more times, send alarm
-	*/
-//	public boolean checkRepeatCompare(CheckData data) {
-//		if(data.getResult() != 1)return false;
-//		
-//		boolean inlist=false;
-//		log.info("no-repeat list length="+devices.size());
-//		for(String d : devices) {			
-//			if(d.equals(data.getDeviceNo())) {
-//				inlist=true;
-//				break;
-//			}
-//		}
-//		
-//		if(!inlist) {
-//			log.info("not in no-repeat list");
-//			return false;
-//		}
-//		
-//		log.info("device in the no-repeat list:"+data.getDeviceNo()+ " " + Util.begin()+" and " + (data.getCompareDate()-5*60*1000));
-//		
-//		CheckData op=checkDataDao.findFirstByCompareDateBetweenAndDeviceNo(Util.begin(), data.getCompareDate()-5*60*1000, data.getDeviceNo());
-//		if(op == null)
-//		{
-//			
-//			log.info("there is no repeat records");
-//			return false;
-//		}
-//		
-//		AlarmData alarmData = new AlarmData(data);
-//		alarmData.setAlarmTime(System.currentTimeMillis());
-//		alarmData.setAlarmType(3);//repeat compare
-//		
-//		alarmDao.save(alarmData);
-//		
-//		sendAlarm(data);
-//		
-//		return true;
-//		
-//	}
-	
 	public void saveCmpRecord(CheckData data) {
 		
 		//repeat records
@@ -170,7 +123,7 @@ public class CheckDataService {
 		
 		SpotImg spotImg = null;
 		if(data.getSpotImg() != null) {
-			spotImg = new SpotImg(data.getSpotImg());		
+			spotImg = new SpotImg(data.getSpotImg());
 			convert(data);			
 		}
 		
@@ -178,6 +131,7 @@ public class CheckDataService {
 		
 		if(spotImg != null) {
 			spotImg.setId(newdata.getId());	
+			spotImg.setCompareDate(data.getCompareDate());
 			spotImgDao.save(spotImg);
 		}
 		
@@ -193,9 +147,6 @@ public class CheckDataService {
 		}
 		
 		data.setId(newdata.getId());
-		
-		//for some device, if there are 2 compare records in one day,send alarm 
-		//boolean isrepeat= checkRepeatCompare(data);
 		
 		if(checkAlarm(data)) {//is alarm data
 			
@@ -234,7 +185,7 @@ public class CheckDataService {
 	public boolean checkAlarm(CheckData data) {		
 		
 		String cardNo = data.getCardNo();
-		BlackList bl = blacklistDao.findByCardNoAndStatus(cardNo, 0);		
+		BlackList bl = blacklistDao.findFirstByCardNoAndStatus(cardNo, 0);		
 		if(bl != null) {	//the user is in blacklist
 			AlarmData alarmData = new AlarmData(data);
 			alarmData.setAlarmTime(System.currentTimeMillis());

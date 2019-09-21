@@ -6,7 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,6 +16,9 @@ import com.shicha.yzmgt.domain.SearchAlarmData;
 import com.shicha.yzmgt.util.Util;
 
 @Entity(name="alarm_data")
+@Table(indexes={
+		@Index(name="compare_time",columnList="compareDate")
+	})
 public class AlarmData {
 
 	@Id

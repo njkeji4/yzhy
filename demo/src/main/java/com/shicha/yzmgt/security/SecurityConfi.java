@@ -38,7 +38,7 @@ public class SecurityConfi extends WebSecurityConfigurerAdapter implements WebMv
 					//for test,remove it when release
 					//"/devicegroup/**","/user/list","/user/update","/device/**","/blacklist/**","/checkdata/**",
 					//"/alarm/**",
-					"/advertisement/**",
+					//"/advertisement/**",
 					//"/version/**",
 					//"/user/add",
 					

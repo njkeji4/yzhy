@@ -18,7 +18,7 @@ public interface IBlaclistDao extends JpaRepository<BlackList, String>{
 	
 	List<BlackList> findByUserName(String userName);
 	
-	public BlackList findByCardNoAndStatus(String cardNo, int status);
+	public BlackList findFirstByCardNoAndStatus(String cardNo, int status);
 	
 	
 	List<BlackList> findAllByGroupIdAndCreateTimeGreaterThanEqual(String groupId, Long create);

@@ -76,11 +76,6 @@
 					
 						AdminAPI.addUser(params).then(({data}) => {
 							if (data.status === 0) {
-								this.$message({
-									message: `增加用户成功!`,
-									type: 'success'
-								});
-
 								this.$emit('data', { result: 'success' });
 								this.modalVisible = false;
 							} else {

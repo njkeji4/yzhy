@@ -24,6 +24,8 @@ public class SearchDevice {
 	String sort="deviceNo";
 	String order = "asc";//"dsc"
 	
+	String groupId;
+	
 	
 	Long totalSuccCount ;
 	Long totalFailCount ;
@@ -146,5 +148,11 @@ public class SearchDevice {
 	}
 	public void setOrder(String order) {
 		this.order = order;
+	}
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 }

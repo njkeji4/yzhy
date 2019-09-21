@@ -18,7 +18,7 @@ public class BlacklistResponse {
 	public BlacklistResponse(List<BlackList> list) {
 		
 		if(list == null || list.size() == 0) {
-			code = 1;
+			code = 0;
 			message = "no black list existed";
 			return;
 		}

@@ -29,5 +29,4 @@ public class DefaultView implements WebMvcConfigurer{
 		registry.addResourceHandler("/download/ad/**").addResourceLocations("file:"+uploadFolder + "/ad/");
 	}
 	
-	
 }

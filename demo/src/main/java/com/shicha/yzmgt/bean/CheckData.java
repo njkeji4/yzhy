@@ -18,7 +18,6 @@ import com.shicha.yzmgt.domain.SearchCheckData;
 import com.shicha.yzmgt.util.Util;
 
 @Entity(name="check_data")
-
 public class CheckData {
 
 	@Id

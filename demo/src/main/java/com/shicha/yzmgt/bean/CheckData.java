@@ -52,6 +52,11 @@ public class CheckData {
 	
 	String groupId;
 	
+	
+	String roomNumber;
+	Long checkInDate;
+	Long checkOutDate;
+	
 	public CheckData() {}
 	
 	
@@ -203,6 +208,32 @@ public class CheckData {
 		this.groupId = groupId;
 	}
 	
+	
+	
+	public String getRoomNumber() {
+		return roomNumber;
+	}
+
+	public void setRoomNumber(String roomNumber) {
+		this.roomNumber = roomNumber;
+	}
+
+	public Long getCheckInDate() {
+		return checkInDate;
+	}
+
+	public void setCheckInDate(Long checkInDate) {
+		this.checkInDate = checkInDate;
+	}
+
+	public Long getCheckOutDate() {
+		return checkOutDate;
+	}
+
+	public void setCheckOutDate(Long checkOutDate) {
+		this.checkOutDate = checkOutDate;
+	}
+
 	public static String Title() {
 		return "设备名称,设备编号,姓名,身份证,性别,比对结果,比对日期\r\n";
 	}

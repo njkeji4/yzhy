@@ -557,10 +557,12 @@ public class CheckDataService {
 			return null;
 		}		
 		
+		//there are too many data, so just search 30 days
 		if(search.getBetrween1() == null) {
-			search.setBetrween1(0l);
+			long endDate = System.currentTimeMillis();
+			search.setBetrween1(endDate - 30 * 24 * 3600);
 		}
-		if(search.getBetrween2() == null) {
+		if(search.getBetrween2() == null) {			
 			search.setBetrween2(System.currentTimeMillis());
 		}		
 			

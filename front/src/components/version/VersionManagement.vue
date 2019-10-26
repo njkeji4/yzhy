@@ -30,6 +30,13 @@
 
 				<el-table-column  prop="oldVersion2" label="最高适用版本" min-width="130" align="center" >
 				</el-table-column>
+
+				<el-table-column prop="groups"  label="适用组"  align="center">
+					<template scope="scope">
+						{{scope.row.groups | groupsFormat}}
+					</template>	
+				</el-table-column>
+
 			</el-table>
 		</section>		
 
@@ -61,7 +68,14 @@
 			}),
 		},
 		filters: {
-			dateFormat: Filters.dateFormat,			
+			dateFormat: Filters.dateFormat,		
+			groupsFormat: (v) => {
+			    var g="";
+				for(var i in v){
+					g += v[i].groupName + " "
+				}				
+			  	return g;
+			}	
 		},
 		methods: {
 			handleSizeChange(size) {

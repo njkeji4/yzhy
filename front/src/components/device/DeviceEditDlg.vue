@@ -18,6 +18,10 @@
                 </el-select>
 			</el-form-item>
 
+            <el-form-item label="设备地址" prop="address">
+				<el-input type="text" v-model="batchEditForm.address" size="small" :value="deviceInfo.address"></el-input>
+			</el-form-item>
+
 		</el-form>
 		<div slot="footer" class="dialog-footer">
 			<el-button size="small" @click="modalVisible = false">取消</el-button>
@@ -44,7 +48,8 @@ export default {
            batchConfigLoading: false,           
            title: '',
            batchEditForm:{
-               name:''
+               name:'',
+               address:'',
            },
            batchEditFormRules: {
                 name: [
@@ -60,6 +65,7 @@ export default {
     created() {                
         
         this.batchEditForm.name = this.deviceInfo.name;
+        this.batchEditForm.address = this.deviceInfo.address;
         this.title = `设备编号: ${this.deviceInfo.deviceNo}`; 
     },
     methods: {
@@ -67,11 +73,16 @@ export default {
 			this.$refs.batchEditForm.validate(valid => {
 				if(valid) {		                   	
 					AdminAPI.updateDevice(
-                        {name:this.batchEditForm.name, deviceNo:this.deviceInfo.deviceNo, groupId:this.group}
+                        {
+                            name:this.batchEditForm.name, 
+                            deviceNo:this.deviceInfo.deviceNo, 
+                            groupId:this.group,
+                            address:this.batchEditForm.address
+                        }
                     ).then(({data}) => {
 						if(data.status === 0) {
 							this.$message({
-								message: '修改设备名称成功!'
+								message: '修改设备信息成功!'
 							});
 							this.$emit('data', {});
 							this.modalVisible = false;

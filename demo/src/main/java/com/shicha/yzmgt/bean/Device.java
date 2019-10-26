@@ -38,6 +38,8 @@ public class Device {
 	
 	String groupId;
 		
+	String address;
+	
 	@Column(nullable=false, columnDefinition="INT default 0")
 	Integer status = 0;
 	
@@ -206,6 +208,14 @@ public class Device {
 
 	public void setTodayAlarm(Long todayAlarm) {
 		this.todayAlarm = todayAlarm;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	
 }

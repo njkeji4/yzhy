@@ -137,6 +137,9 @@ public class DeviceService {
 			oldDevice.setName(device.getName());
 			oldDevice.setGroupId(device.getGroupId());
 			
+			if(device.getAddress() != null && device.getAddress().length() > 0)
+				oldDevice.setAddress(device.getAddress());
+			
 			deviceDao.save(oldDevice);
 			
 			return true;

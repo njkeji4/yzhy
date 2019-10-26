@@ -1,9 +1,16 @@
 package com.shicha.yzmgt.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -22,6 +29,11 @@ public class Version {
 	
 	String oldVersion1;
 	String oldVersion2;	
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name="ver_group", joinColumns=@JoinColumn(name="ver_id", referencedColumnName="id"), 
+		inverseJoinColumns = @JoinColumn(name="group_id", referencedColumnName="group_id"))	
+	List<DeviceGroup> groups;
 	
 	public String getOldVersion1() {
 		return oldVersion1;
@@ -58,6 +70,21 @@ public class Version {
 	}
 	public void setVersionNo(String versionNo) {
 		this.versionNo = versionNo;
+	}
+	
+	public List<DeviceGroup> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<DeviceGroup> groups) {
+		this.groups = groups;
+	}
+	
+	public void addGroup(DeviceGroup group) {
+		if(groups == null)
+			groups = new ArrayList<DeviceGroup>();
+		
+		groups.add(group);
 	}
 	
 }

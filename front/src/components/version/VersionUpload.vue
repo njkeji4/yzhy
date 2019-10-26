@@ -2,9 +2,9 @@
 	<el-dialog title="上传" ref="modal" :visible.sync="modalVisible" 
 		:close-on-click-modal="true"
 		class="add-device-form">
-		<el-form ref="form" :model="form" >
+		<el-form ref="form" :model="form"  :rules="uploadformrules">
 			
-		<el-form-item class="file-wrap" prop="file">
+		<el-form-item class="file-wrap" prop="file" >
 
 			<el-upload class='ensure' 
 				ref="uploadForm"
@@ -21,16 +21,22 @@
 			</el-upload>
 		</el-form-item>
 		
-		<el-form-item label="最低适用版本:" prop="minVersion">  
+		<el-form-item label="最低适用版本:" prop="minVersion" :label-width='labelwidth'>  
             <el-select clearable size="small" v-model="form.minVersion" placeholder="请选择">
 				<el-option v-for="item in versions" :label="item" :value="item"></el-option>
 			</el-select>
 		</el-form-item>
 
-		<el-form-item label="最高适用版本:" prop="maxVersion">  
+		<el-form-item label="最高适用版本:" prop="maxVersion" :label-width='labelwidth'>  
             <el-select clearable size="small" v-model="form.maxVersion" placeholder="请选择">
 				<el-option v-for="item in versions" :label="item" :value="item"></el-option>
 			</el-select>
+		</el-form-item>
+
+		<el-form-item label="适用组:" prop="groups" :label-width='labelwidth'>
+				<el-select clearable size="small" v-model="form.groups" multiple placeholder="请选择">
+					<el-option v-for="item in groups" :label="item.groupName" :value="item.groupId"></el-option>
+				</el-select>
 		</el-form-item>
 	
 		
@@ -52,15 +58,17 @@
 	export default {
 		
 		data: function() {
-			return { // add				
+			return { 		
 				form: {
                     minVersion: '',
 					maxVersion:'',
                     file: '',
 					dateTimeRange: [],
+					groups:[],
 					previousVersion:'',
                 },
-                dataParams:{minVersion:'', maxVersion:''},
+				groups:[],
+                dataParams:{minVersion:'', maxVersion:'',groups:[]},
                 minVersion:'',
 				maxVersion:'',
 				uploadUrl:AdminAPI.uploadUrl,
@@ -69,6 +77,20 @@
 				disabled:true,
 				versions:['1','2'],				
 				fileList:[],
+				labelwidth:'120px',
+				uploadformrules: {
+						minVersion: [
+							{ required: true, message: '选择最小使用版本', trigger: 'change' },
+						],
+						
+						maxVersion:[
+							{ required: true, message: '选择最大适用版本', trigger: 'change' },
+						],
+						groups:[
+							{ required: true, message: '选择广告适用的设备组', trigger: 'change' },
+						],
+
+				},
 			}
 		},
 		computed: {
@@ -105,6 +127,7 @@
 				 this.$refs.form.validate((valid) => {
 				 	this.dataParams.minVersion = this.form.minVersion;
 					 this.dataParams.maxVersion = this.form.maxVersion;
+					 this.dataParams.groups = this.form.groups;
 					 if(this.fileList.length > 1){
 						this.$message.error('一次上传一个文件');
 						return;
@@ -112,11 +135,27 @@
 					this.$refs.uploadForm.submit();
 					
 				 });
-			},			
+			},	
+
+			getDeviceGroup(){
+				AdminAPI.getDeviceGroups().then(({
+					data: jsonData
+				}) => {
+					if(jsonData.status === 0) {
+						this.groups = jsonData.data;
+					} else {
+						this.$message({
+							messsage: `获取组失败:${data.msg}`,
+							type: 'error'
+						})
+					}
+				});
+			},	
 		},
 		
 		mounted() {
 			this.getExistedVersions();
+			this.getDeviceGroup();
 		}
 	}
 </script>

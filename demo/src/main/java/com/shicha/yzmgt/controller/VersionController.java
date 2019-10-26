@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shicha.yzmgt.bean.User;
 import com.shicha.yzmgt.bean.Version;
+import com.shicha.yzmgt.dao.IDeviceGroupDao;
 import com.shicha.yzmgt.domain.APIResult;
 import com.shicha.yzmgt.service.DeviceService;
 import com.shicha.yzmgt.service.VersionService;
@@ -43,12 +44,13 @@ public class VersionController {
 	@Value("${host.url:http://localhost:8300}")
 	String hostUrl;
 	
+	
 	@RequestMapping(value="/add", method=RequestMethod.POST)
 	public APIResult addUser(
 			@RequestBody Version version,
 			HttpServletRequest req, HttpServletResponse response) throws IOException{
 		
-		versionService.addVersion(version);
+		//versionService.addVersion(version);
 
 		return new APIResult(0);
 	}
@@ -86,6 +88,7 @@ public class VersionController {
 			@RequestParam("uploadFile") MultipartFile file,
 			@RequestParam("minVersion") String minVersion,
 			@RequestParam("maxVersion") String maxVersion,
+			@RequestParam("groups") String[] groups,
 			HttpServletRequest request, HttpServletResponse response) throws IOException{
 		
 		String filename = UUID.randomUUID().toString() + file.getOriginalFilename();
@@ -121,7 +124,7 @@ public class VersionController {
         	ex.printStackTrace();
         }
         
-		versionService.addVersion(version);
+		versionService.addVersion(version,groups);
 
 		return new APIResult(0);
 	}

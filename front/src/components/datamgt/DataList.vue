@@ -80,6 +80,18 @@
 					</template>
 				</el-table-column>
 
+				<el-table-column sortable="custom"  prop="roomNumber" label="房间号" width="150"></el-table-column>
+				<el-table-column sortable="custom"  prop="checkInDate" label="入住时间" width="150">
+					<template slot-scope="scope">
+						{{scope.row.checkInDate | dateFormat}}
+					</template>
+				</el-table-column>
+				<el-table-column sortable="custom"  prop="checkOutDate" label="离开时间" width="150">
+					<template slot-scope="scope">
+						{{scope.row.checkOutDate | dateFormat}}
+					</template>
+				</el-table-column>
+
 				<el-table-column   prop="folk" label="民族" ></el-table-column>						
 				<el-table-column  prop="sex" label="性别" >
 					<template slot-scope="scope">						

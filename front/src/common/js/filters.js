@@ -4,7 +4,7 @@ const dateFormat = (v, format = 'yyyy-MM-dd hh:mm:ss') => {
     if(isNaN(v)) {
         return '';
     }
-    if(v == 0){
+    if(v == 0 || v == null){
         return '';
     }
     var d;

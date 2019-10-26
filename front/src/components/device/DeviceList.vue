@@ -71,8 +71,12 @@
 				<el-table-column  sortable="custom" prop="totalSuccCount" label="认证总数" width="150">
 				</el-table-column>	
 
-				<el-table-column  prop="versionNo" label="客户端版本" sortable="custom">
-				</el-table-column>			
+				<el-table-column  prop="versionNo" label="版本" sortable="custom">
+				</el-table-column>	
+
+				<el-table-column  prop="address" label="设备地址" width="240">
+				</el-table-column>
+						
 				
 			</el-table>
 		</section>
@@ -238,7 +242,7 @@
 			handleDblClickRow(row, event) {				
 				openDeviceEditDlg({
 					data: {
-						deviceInfo: row,
+						deviceInfo: row,						
 						groups:this.groups,
 						group:this.groupMaps[row.groupId]
 					}

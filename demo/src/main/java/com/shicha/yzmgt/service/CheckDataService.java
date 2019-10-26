@@ -558,13 +558,15 @@ public class CheckDataService {
 		}		
 		
 		//there are too many data, so just search 30 days
-		if(search.getBetrween1() == null) {
-			long endDate = System.currentTimeMillis();
-			search.setBetrween1(endDate - 30 * 24 * 3600);
+		long endDate = System.currentTimeMillis();
+		if(search.getBetrween1() == null) {			
+			search.setBetrween1(endDate - 30 * 24 * 3600 * 1000l);
 		}
 		if(search.getBetrween2() == null) {			
-			search.setBetrween2(System.currentTimeMillis());
+			search.setBetrween2(endDate);
 		}		
+		
+		log.info(search.getBetrween1()+"  " +search.getBetrween2() +  "end date="+endDate);
 			
 		String fromsql=" from check_data where compare_date >= " + search.getBetrween1() + " and compare_date <= "+ search.getBetrween2();
 				

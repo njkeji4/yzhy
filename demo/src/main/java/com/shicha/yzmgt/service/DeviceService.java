@@ -40,6 +40,7 @@ import com.shicha.yzmgt.dao.IDeviceDao;
 import com.shicha.yzmgt.dao.IUserDao;
 import com.shicha.yzmgt.domain.GetVersionReq;
 import com.shicha.yzmgt.domain.SearchDevice;
+import com.shicha.yzmgt.util.Baidu;
 
 @Service
 public class DeviceService {
@@ -137,8 +138,14 @@ public class DeviceService {
 			oldDevice.setName(device.getName());
 			oldDevice.setGroupId(device.getGroupId());
 			
-			if(device.getAddress() != null && device.getAddress().length() > 0)
+			if(device.getAddress() != null && device.getAddress().length() > 0 && !oldDevice.getAddress().equals(device.getAddress())) {
 				oldDevice.setAddress(device.getAddress());
+				
+				String lnglat=Baidu.getCoordinate(device.getAddress());
+				log.info("device="+device.getAddress() + "lnglat=" + lnglat);
+				
+				oldDevice.setLanlat(lnglat);
+			}
 			
 			deviceDao.save(oldDevice);
 			

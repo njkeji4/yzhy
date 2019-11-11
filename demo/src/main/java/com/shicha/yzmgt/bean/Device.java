@@ -40,6 +40,8 @@ public class Device {
 		
 	String address;
 	
+	String lanlat;
+	
 	@Column(nullable=false, columnDefinition="INT default 0")
 	Integer status = 0;
 	
@@ -216,6 +218,14 @@ public class Device {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getLanlat() {
+		return lanlat;
+	}
+
+	public void setLanlat(String lanlat) {
+		this.lanlat = lanlat;
 	}
 	
 }

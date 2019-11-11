@@ -25,7 +25,7 @@ public class Baidu {
 	
 	public static void main(String[] args) {
 		
-		String addr="南京市黄山路";
+		String addr="南京市";
 		System.out.println(getCoordinate(addr));
 	}
 	

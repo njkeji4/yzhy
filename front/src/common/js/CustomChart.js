@@ -140,13 +140,14 @@ var pie = function(){
                     normal: {
                         show: true,
                         color:'white',
-                        //position: 'inside',
-                        formatter: '{b}({c})',
+                        position: 'inside',
+                        formatter: '{c}',
                     },
                     emphasis: {
-                        show: false,
+                        show: true,
                         textStyle: {
-                            fontSize: '30',
+                            
+                            formatter: '{b}({c})',
                             fontWeight: 'bold'
                         }
                     }

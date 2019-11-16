@@ -2,8 +2,8 @@
         <el-row class="" :gutter="20" style="height:100%;background: radial-gradient(circle,#081c59,#083171);">
           <el-col :span="12" class="" style="height:100%;">
               <el-row style="height:50%;">
-                 <div ref="certPie" class="chartcontainer"></div>
-                  <div ref="devicePie" class="chartcontainer"/>
+                 <div ref="certPie" class="chartcontainer" ></div>
+                  <div ref="devicePie" class="chartcontainer" />
                    
               </el-row>
               <el-row style="height:50%;">
@@ -95,9 +95,14 @@ export default {
             this.usedalarmCount = data.data.totalAlarmCount;
 
             this.devices= data.data.devices;
-            this.deviceGroups = data.data.groups;
+            this.deviceGroups = data.data.deviceGroups;
+           
+            this.loadPie();
+             this.loadBar();
+            this.loadMap();
           }					
 				}).catch((err) => {
+                    console.log(err);
 					this.$message.error('Error', err);
 
 				});
@@ -124,9 +129,7 @@ export default {
         devicePieOption.title.text="今日";
 
         certPie.setOption(cerPieOption);
-        devicePie.setOption(devicePieOption);
-
-        
+        devicePie.setOption(devicePieOption);        
       },
       loadMap(){
              var offline = {
@@ -134,7 +137,7 @@ export default {
                 type: 'scatter',
                 coordinateSystem: 'geo',
                 data: [
-                    {name:'one', value:[107.736419707031,26.8329177070313,1]}                   
+                                     
                 ],
                 symbolSize: 20,
                 label: {
@@ -187,7 +190,9 @@ export default {
             var mapOption = CustomChart.map();
            
             for(var i = 0; i  < this.devices.length; i++){
+                if(this.devices[i].lanlat === null || this.devices[i].lanlat === undefined)continue;
                 var lanlat = this.devices[i].lanlat.split(",");
+                if(lanlat.length != 2)continue;
                 if(this.devices[i].status == 0){
                   online.data.push({name:this.devices[i].name,value:[lanlat[0],lanlat[1],10]});
                 }else{
@@ -215,13 +220,7 @@ export default {
       },
   },
   mounted() {
-			//this.gettodayData();
-
-      this.loadPie();
-
-      this.loadMap();
-
-      this.loadBar();
+			this.gettodayData();
 		}
 }
 </script>

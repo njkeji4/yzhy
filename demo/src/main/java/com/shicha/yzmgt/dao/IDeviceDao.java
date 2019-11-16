@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.shicha.yzmgt.bean.Device;
 import com.shicha.yzmgt.bean.DeviceGroup;
+import com.shicha.yzmgt.domain.StatGroup;
 import com.shicha.yzmgt.domain.TodayData;
 
 @Repository
@@ -48,6 +49,11 @@ public interface IDeviceDao extends JpaRepository<Device, String>,JpaSpecificati
 		+ "count(status) -  sum(status), sum(status), sum(todayAlarm), sum(totalAlarm)"
 		+ ") from device")
 	TodayData selectTodayStatistics();
+	
+	@Transactional
+	@Query(value="select new com.shicha.yzmgt.domain.StatGroup(groupId,sum(totalSuccCount),"
+			+ "sum(totalFailCount),sum(totalAlarm)) from device group by groupId")
+	List<StatGroup> selectGroupStatistics();
 
 	@Transactional
 	@Query(value="select new com.shicha.yzmgt.domain.TodayData("		
@@ -56,6 +62,10 @@ public interface IDeviceDao extends JpaRepository<Device, String>,JpaSpecificati
 		+ ") from device where groupId in ?1")
 	TodayData selectTodayStatistics(List<String>groupIds);
 	
+	
+	@Query(value="select * from device where group_id in ?1",nativeQuery=true)
+	List<Device> getAll(List<String>groupIds);
+
 	
 	@Transactional
 	@Query(value="select new com.shicha.yzmgt.bean.DeviceGroup("		

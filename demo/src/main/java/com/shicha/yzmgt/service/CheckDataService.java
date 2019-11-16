@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,7 @@ import com.shicha.yzmgt.dao.IAlarmDataDao;
 import com.shicha.yzmgt.dao.IBlaclistDao;
 import com.shicha.yzmgt.dao.ICheckData;
 import com.shicha.yzmgt.dao.IDeviceDao;
+import com.shicha.yzmgt.dao.IDeviceGroupDao;
 import com.shicha.yzmgt.dao.IErroRecord;
 
 import com.shicha.yzmgt.dao.ISettingDao;
@@ -59,6 +61,7 @@ import com.shicha.yzmgt.dao.IUserDao;
 import com.shicha.yzmgt.domain.SearchAlarmData;
 import com.shicha.yzmgt.domain.SearchCheckData;
 import com.shicha.yzmgt.domain.SearchDevice;
+import com.shicha.yzmgt.domain.StatGroup;
 import com.shicha.yzmgt.domain.TodayData;
 import com.shicha.yzmgt.util.Util;
 
@@ -77,6 +80,9 @@ public class CheckDataService {
 	
 	@Autowired
 	IDeviceDao deviceDao;
+	
+	@Autowired
+	IDeviceGroupDao deviceGroupDao;
 	
 	@Autowired
 	IAlarmDataDao alarmDao;
@@ -270,15 +276,37 @@ public class CheckDataService {
 		
 		final User user = userDao.findByName(userName);
 		
+		TodayData today;
+		List<Device>devices;
+		
 		try{
-			if(user == null || user.getRole().equals(User.ROLE_ADMIN))
-				return deviceDao.selectTodayStatistics();
-			
-			if(user.getGroups().size() == 0) {
-				return new TodayData();
+			if(user == null || user.getRole().equals(User.ROLE_ADMIN)) {			
+				today =  deviceDao.selectTodayStatistics();
+				devices = deviceDao.findAll();
+			}else if(!user.getRole().equals(User.ROLE_ADMIN) && user.getGroups().size() == 0) {
+				today =  new TodayData();
+				return today;
+			}else {			
+				today =  deviceDao.selectTodayStatistics(getUserGroupIds(user));
+				devices = deviceDao.getAll(getUserGroupIds(user));
 			}
 			
-			return deviceDao.selectTodayStatistics(getUserGroupIds(user));
+			List<StatGroup> tt = deviceDao.selectGroupStatistics();
+			List<DeviceGroup>groups=deviceGroupDao.findAll();
+			
+			for(StatGroup t : tt) {
+				for(DeviceGroup g : groups) {
+					if(g.getGroupId().equals(t.getName())){
+						t.setName(g.getGroupName());
+						break;
+					}
+				}
+			}
+			
+			today.setDevices(devices);
+			today.setDeviceGroups(tt);
+			//
+			return today;
 			
 		}catch(Exception ex) {
 			ex.printStackTrace();

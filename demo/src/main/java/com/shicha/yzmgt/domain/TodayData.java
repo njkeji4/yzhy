@@ -1,8 +1,10 @@
 package com.shicha.yzmgt.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.shicha.yzmgt.bean.CheckData;
+import com.shicha.yzmgt.bean.Device;
 
 public class TodayData {
 
@@ -18,6 +20,9 @@ public class TodayData {
 	long totalFail;
 	
 	long totalAlarmCount;
+	
+	List<Device>devices;
+	List<StatGroup>deviceGroups;
 	
 	public TodayData() {}
 	
@@ -36,6 +41,7 @@ public class TodayData {
 		this.alarmCount = todayAlarm;
 		this.totalAlarmCount = totalAlarm;
 	}
+	
 	
 	public long getSuccessCount() {
 		return successCount;
@@ -86,4 +92,23 @@ public class TodayData {
 	public void setTotalAlarmCount(int totalAlarmCount) {
 		this.totalAlarmCount = totalAlarmCount;
 	}
+
+	public List<StatGroup> getDeviceGroups() {
+		return deviceGroups;
+	}
+
+	public void setDeviceGroups(List<StatGroup> deviceGroups) {
+		this.deviceGroups = deviceGroups;
+	}
+	
+
+	public List<Device> getDevices() {
+		return devices;
+	}
+
+	public void setDevices(List<Device> devices) {
+		this.devices = devices;
+	}
+	
 }
+

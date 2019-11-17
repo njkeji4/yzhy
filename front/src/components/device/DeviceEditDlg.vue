@@ -71,7 +71,8 @@ export default {
     methods: {
 		batchEdidtSubmit() {            
 			this.$refs.batchEditForm.validate(valid => {
-				if(valid) {		                   	
+				if(valid) {		        
+                    console.log(this.group)           	
 					AdminAPI.updateDevice(
                         {
                             name:this.batchEditForm.name, 

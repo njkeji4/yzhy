@@ -28,7 +28,7 @@ import { mapGetters } from 'vuex';
 import { AdminAPI } from '../../api';
 import Filters from '../../common/js/filters';
 import echarts from 'echarts';
-import Qiannan from '../../assets/522700.json'
+import Qiannan from '../../assets/522200.json'
 import CustomChart from '../../common/js/CustomChart';
 
 export default {

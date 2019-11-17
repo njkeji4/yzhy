@@ -244,7 +244,7 @@
 					data: {
 						deviceInfo: row,						
 						groups:this.groups,
-						group:this.groupMaps[row.groupId]
+						group:row.groupId
 					}
 				}).then((data) => {
 					// TODO: 拦截close事件,添加参数

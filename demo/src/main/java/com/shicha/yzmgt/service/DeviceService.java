@@ -138,7 +138,9 @@ public class DeviceService {
 			oldDevice.setName(device.getName());
 			oldDevice.setGroupId(device.getGroupId());
 			
-			if(device.getAddress() != null && device.getAddress().length() > 0 && !oldDevice.getAddress().equals(device.getAddress())) {
+			if(device.getAddress() != null && !device.getAddress().equals(oldDevice.getAddress()) )
+			{
+			
 				oldDevice.setAddress(device.getAddress());
 				
 				String lnglat=Baidu.getCoordinate(device.getAddress());
